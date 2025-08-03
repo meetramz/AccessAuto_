@@ -764,22 +764,47 @@ const servicesArr = [
                     borderRadius: '0 var(--radius-xl) var(--radius-xl) 0'
                   }}>
                 </div>
-                <div className="absolute bottom-8 right-8 p-6 glass-effect rounded-xl max-w-xs"
+                <a 
+                  href="https://maps.app.goo.gl/dKcKVbrEf2JxkG597" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="absolute bottom-8 right-8 p-6 glass-effect rounded-xl max-w-xs hover:scale-105 transition-transform duration-300 cursor-pointer"
                   style={{
                     boxShadow: 'var(--shadow-md)',
                     borderRadius: 'var(--radius-md)',
-                    border: '1px solid var(--card-border)'
+                    border: '1px solid var(--card-border)',
+                    textDecoration: 'none'
                   }}>
-                  <div className="text-3xl font-bold mb-2" style={{ color: 'var(--primary-blue)' }}>4.9</div>
+                  <div className="flex items-center gap-3 mb-3">
+                    <div className="relative">
+                      <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ background: 'linear-gradient(45deg, #4285f4, #34a853, #fbbc05, #ea4335)' }}>
+                        <svg className="w-6 h-6 text-white" viewBox="0 0 24 24" fill="currentColor">
+                          <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+                        </svg>
+                      </div>
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-1">
+                        <span className="text-lg font-bold" style={{ color: '#4285f4' }}>G</span>
+                        <span className="text-lg font-bold" style={{ color: '#ea4335' }}>o</span>
+                        <span className="text-lg font-bold" style={{ color: '#fbbc05' }}>o</span>
+                        <span className="text-lg font-bold" style={{ color: '#4285f4' }}>g</span>
+                        <span className="text-lg font-bold" style={{ color: '#34a853' }}>l</span>
+                        <span className="text-lg font-bold" style={{ color: '#ea4335' }}>e</span>
+                      </div>
+                      <div className="text-sm font-semibold text-gray-700">Customer Reviews</div>
+                    </div>
+                  </div>
                   <div className="flex gap-1 mb-2">
                     {[1,2,3,4,5].map(star => (
-                      <svg key={star} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4" style={{ color: '#fbbf24' }}>
+                      <svg key={star} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5" style={{ color: '#fbbc05' }}>
                         <path fillRule="evenodd" d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.007 5.404.433c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.433 2.082-5.006z" clipRule="evenodd" />
                       </svg>
                     ))}
                   </div>
-                  <div style={{ color: 'var(--text-muted)' }}>Based on 200+ customer reviews</div>
-                </div>
+                  <div className="text-sm font-semibold text-gray-700 mb-1">100% Customer Satisfaction</div>
+                  <div className="text-xs text-gray-500">Click to view all reviews</div>
+                </a>
               </div>
             </div>
           </div>
