@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import emailjs from '@emailjs/browser';
-import { MapPin, Phone, Mail, Send, CheckCircle, ExternalLink } from 'lucide-react';
+import { MapPin, Phone, Mail, Send, CheckCircle, ExternalLink, Clock } from 'lucide-react';
 import CartDropdown from '../components/CartDropdown';
 
 const Contact = () => {
@@ -105,6 +105,31 @@ const Contact = () => {
             Emergency: 01782 405229
           </a>
         </p>
+      ),
+    },
+    {
+      icon: <Clock className="w-6 h-6 text-indigo-600" />,
+      title: 'Opening Hours',
+      content: (
+        <div className="space-y-1 text-sm">
+          <div className="flex justify-between">
+            <span className="font-medium">Monday - Friday:</span>
+            <span>9:00 AM - 6:00 PM</span>
+          </div>
+          <div className="flex justify-between">
+            <span className="font-medium">Saturday:</span>
+            <span>10:00 AM - 5:00 PM</span>
+          </div>
+          <div className="flex justify-between">
+            <span className="font-medium">Sunday:</span>
+            <span className="text-red-600 font-medium">Closed</span>
+          </div>
+          <div className="mt-2 pt-2 border-t border-gray-200">
+            <p className="text-xs text-gray-600">
+              Please call ahead to confirm availability for same-day appointments.
+            </p>
+          </div>
+        </div>
       ),
     },
   ];

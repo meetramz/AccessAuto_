@@ -29,9 +29,9 @@ const classOptions = [
 ];
 
 const timeSlots = [
-  '08:00', '08:30', '09:00', '09:30', '10:00', '10:30',
-  '11:00', '11:30', '12:00', '12:30', '13:00', '13:30',
-  '14:00', '14:30', '15:00', '15:30', '16:00', '16:30'
+  '09:00', '09:30', '10:00', '10:30', '11:00', '11:30',
+  '12:00', '12:30', '13:00', '13:30', '14:00', '14:30',
+  '15:00', '15:30', '16:00', '16:30', '17:00', '17:30'
 ];
 
 function Booking() {
@@ -136,10 +136,39 @@ function Booking() {
         };
       });
     } else {
-      setBookingData(prev => ({
-        ...prev,
-        [field]: value
-      }));
+      setBookingData(prev => {
+        const newData = {
+          ...prev,
+          [field]: value
+        };
+        
+        // If date is being changed, check if current time is still valid
+        if (field === 'date' && value) {
+          const selectedDate = new Date(value);
+          const dayOfWeek = selectedDate.getDay();
+          
+          // Clear time if Sunday (closed) or if current time is not available for the new date
+          if (dayOfWeek === 0) {
+            newData.time = '';
+          } else {
+            const availableSlots = timeSlots.filter(time => {
+              const hour = parseInt(time.split(':')[0]);
+              if (dayOfWeek === 6) { // Saturday
+                return hour >= 10 && hour < 17;
+              } else { // Monday to Friday
+                return hour >= 9 && hour < 18;
+              }
+            });
+            
+            // Clear time if current selection is not available for the new date
+            if (prev.time && !availableSlots.includes(prev.time)) {
+              newData.time = '';
+            }
+          }
+        }
+        
+        return newData;
+      });
     }
   };
 
@@ -388,6 +417,35 @@ function Booking() {
   const motClassOption = classOptions.find(opt => opt.label === bookingData.motClass);
   const motPrice = motClassOption ? motClassOption.price : selectedService?.price;
 
+  // Filter time slots based on selected date
+  const getAvailableTimeSlots = () => {
+    if (!bookingData.date) return timeSlots;
+    
+    const selectedDate = new Date(bookingData.date);
+    const dayOfWeek = selectedDate.getDay(); // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
+    
+    // Sunday - closed
+    if (dayOfWeek === 0) {
+      return [];
+    }
+    
+    // Saturday - 10:00 AM to 5:00 PM
+    if (dayOfWeek === 6) {
+      return timeSlots.filter(time => {
+        const hour = parseInt(time.split(':')[0]);
+        return hour >= 10 && hour < 17;
+      });
+    }
+    
+    // Monday to Friday - 9:00 AM to 6:00 PM
+    return timeSlots.filter(time => {
+      const hour = parseInt(time.split(':')[0]);
+      return hour >= 9 && hour < 18;
+    });
+  };
+
+  const availableTimeSlots = getAvailableTimeSlots();
+
   return (
     <div className="min-h-screen bg-gray-50">
       <CartDropdown />
@@ -503,6 +561,57 @@ function Booking() {
             {step === 2 && (
               <div className="bg-white rounded-lg shadow-lg p-8">
                 <h2 className="text-3xl font-bold text-gray-800 mb-8">Choose Date & Time</h2>
+                
+                {/* Business Hours Information */}
+                <div className="mb-8 bg-blue-50 border border-blue-200 rounded-lg p-6">
+                  <h3 className="text-lg font-semibold text-blue-800 mb-4 flex items-center">
+                    <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    Our Opening Hours
+                  </h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                    <div className="space-y-2">
+                      <div className="flex justify-between">
+                        <span className="font-medium text-gray-700">Monday:</span>
+                        <span className="text-blue-700">9:00 AM - 6:00 PM</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="font-medium text-gray-700">Tuesday:</span>
+                        <span className="text-blue-700">9:00 AM - 6:00 PM</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="font-medium text-gray-700">Wednesday:</span>
+                        <span className="text-blue-700">9:00 AM - 6:00 PM</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="font-medium text-gray-700">Thursday:</span>
+                        <span className="text-blue-700">9:00 AM - 6:00 PM</span>
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <div className="flex justify-between">
+                        <span className="font-medium text-gray-700">Friday:</span>
+                        <span className="text-blue-700">9:00 AM - 6:00 PM</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="font-medium text-gray-700">Saturday:</span>
+                        <span className="text-blue-700">10:00 AM - 5:00 PM</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="font-medium text-gray-700">Sunday:</span>
+                        <span className="text-red-600 font-medium">Closed</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-md">
+                    <p className="text-sm text-yellow-800">
+                      <strong>Note:</strong> Please select your preferred appointment time within our operating hours. 
+                      We'll confirm availability and contact you if any adjustments are needed.
+                    </p>
+                  </div>
+                </div>
+
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">Select Date</label>
@@ -516,16 +625,25 @@ function Booking() {
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">Select Time</label>
-                    <select
-                      value={bookingData.time}
-                      onChange={e => handleInputChange(null, 'time', e.target.value)}
-                      className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    >
-                      <option value="">Select Time</option>
-                      {timeSlots.map(time => (
-                        <option key={time} value={time}>{time}</option>
-                      ))}
-                    </select>
+                    {availableTimeSlots.length === 0 && bookingData.date ? (
+                      <div className="w-full p-3 border border-red-300 rounded-lg bg-red-50 text-red-700 text-center">
+                        We are closed on the selected date. Please choose a different day.
+                      </div>
+                    ) : (
+                      <select
+                        value={bookingData.time}
+                        onChange={e => handleInputChange(null, 'time', e.target.value)}
+                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        disabled={availableTimeSlots.length === 0}
+                      >
+                        <option value="">
+                          {bookingData.date ? 'Select Time' : 'Please select a date first'}
+                        </option>
+                        {availableTimeSlots.map(time => (
+                          <option key={time} value={time}>{time}</option>
+                        ))}
+                      </select>
+                    )}
                   </div>
                 </div>
               </div>

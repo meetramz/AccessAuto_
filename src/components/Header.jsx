@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import {
-  Menu, X, MapPin, Phone, Clock, User, ChevronDown,
-  Calendar, ShieldCheck, Mail
+  Menu, X, MapPin, Phone, User, ChevronDown,
+  Calendar, ShieldCheck, Mail, Clock
 } from 'lucide-react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faYelp, faFacebook, faInstagram } from '@fortawesome/free-brands-svg-icons';
@@ -130,16 +130,6 @@ const Header = () => {
                   <FontAwesomeIcon icon={faYelp} className="w-4 h-4" />
                 </a>
               </div>
-              <a 
-                href="https://maps.app.goo.gl/dKcKVbrEf2JxkG597"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-2 hover:text-blue-200 transition-all duration-300"
-              >
-                <MapPin size={16} />
-                <span className="hidden md:inline">9 Chelson St, Longton, ST3 1PT</span>
-                <span className="md:hidden">Garage Location</span>
-              </a>
             </div>
           </div>
         </div>
