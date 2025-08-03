@@ -2,10 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import {
   Menu, X, MapPin, Phone, Clock, User, ChevronDown,
-  Calendar, ShieldCheck
+  Calendar, ShieldCheck, Mail
 } from 'lucide-react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faYelp } from '@fortawesome/free-brands-svg-icons';
+import { faYelp, faFacebook, faInstagram } from '@fortawesome/free-brands-svg-icons';
 import logo from '../assets/logo.png';
 
 const Header = () => {
@@ -81,6 +81,11 @@ const Header = () => {
                 <Phone size={16} />
                 <span>01782 405229</span>
               </a>
+              <a href="mailto:info.accessautoservices@gmail.com" className="flex items-center gap-2 hover:text-blue-200 transition-all duration-300">
+                <Mail size={16} />
+                <span className="hidden md:inline">info.accessautoservices@gmail.com</span>
+                <span className="md:hidden">Email Us</span>
+              </a>
             </div>
             <div className="flex items-center gap-4">
               <a
@@ -92,29 +97,49 @@ const Header = () => {
                 <User size={16} />
                 <span className="hidden sm:inline">My Account</span>
               </a>
-              <a href="https://maps.app.goo.gl/dKcKVbrEf2JxkG597" target="_blank" rel="noopener noreferrer" className="hidden md:flex items-center gap-2 hover:text-blue-200 transition-all duration-300 py-1 px-2 rounded-full" style={{ background: 'rgba(255, 255, 255, 0.1)' }}>
+              <div className="hidden md:flex items-center gap-2 py-1 px-2 rounded-full" style={{ background: 'rgba(255, 255, 255, 0.1)' }}>
                 <ShieldCheck size={14} />
-                <span className="text-xs font-medium">MOT Certified</span>
-              </a>
-              <a
-                href="https://www.yell.com/biz/access-auto-services-stoke-on-trent-10712583/"
+                <span className="text-xs font-medium">MOT</span>
+              </div>
+              <div className="hidden md:flex items-center gap-2">
+                <a
+                  href="https://www.facebook.com/accessautoservices"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:text-blue-200 transition-all duration-300 p-1"
+                  title="Follow us on Facebook"
+                >
+                  <FontAwesomeIcon icon={faFacebook} className="w-4 h-4" />
+                </a>
+                <a
+                  href="https://www.instagram.com/accessautoservices"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:text-pink-200 transition-all duration-300 p-1"
+                  title="Follow us on Instagram"
+                >
+                  <FontAwesomeIcon icon={faInstagram} className="w-4 h-4" />
+                </a>
+                <a
+                  href="https://www.yell.com/biz/access-auto-services-stoke-on-trent-10712583/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:text-yellow-200 transition-all duration-300 p-1"
+                  title="Find us on Yell"
+                >
+                  <FontAwesomeIcon icon={faYelp} className="w-4 h-4" />
+                </a>
+              </div>
+              <a 
+                href="https://maps.app.goo.gl/dKcKVbrEf2JxkG597"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="hidden md:flex items-center gap-2 hover:text-yellow-200 transition-all duration-300 py-1 px-2 rounded-full"
-                style={{ background: 'rgba(255, 255, 255, 0.1)' }}
-                title="Find us on Yell"
+                className="flex items-center gap-2 hover:text-blue-200 transition-all duration-300"
               >
-                <FontAwesomeIcon icon={faYelp} className="w-3 h-3" />
-                <span className="text-xs font-medium">Yell Reviews</span>
+                <MapPin size={16} />
+                <span className="hidden md:inline">9 Chelson St, Longton, ST3 1PT</span>
+                <span className="md:hidden">Garage Location</span>
               </a>
-              <a 
-  href="/contact#garage-map"
-  className="flex items-center gap-2 hover:text-blue-200 transition-all duration-300"
->
-  <MapPin size={16} />
-  <span className="hidden md:inline">Garage Location</span>
-  <span className="md:hidden">Our Location</span>
-</a>
             </div>
           </div>
         </div>
@@ -284,8 +309,9 @@ const Header = () => {
                   <Clock size={18} className="text-blue-600" />
                   <div>
                     <p className="text-sm font-medium">Opening Hours</p>
-                    <p className="text-sm">Mon-Fri: 8AM-6PM</p>
-                    <p className="text-sm">Sat: 8AM-4PM</p>
+                    <p className="text-sm">Mon-Fri: 9:00 AM–6:00 PM</p>
+                    <p className="text-sm">Sat: 10:00 AM–5:00 PM</p>
+                    <p className="text-sm">Sun: Closed</p>
                   </div>
                 </div>
               </div>
