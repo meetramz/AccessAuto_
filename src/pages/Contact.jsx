@@ -35,7 +35,7 @@ const Contact = () => {
 
     emailjs.send(
       'service_oiajj6l',      // Your Service ID
-      'service_oiajj6l',     // Your Template ID
+      'template_uqlk0o9',     // Your Template ID
       formData,               // Data object matching your template variables
       '0IEdHQs1NcrJgl-Cy'    // Your Public Key (User ID)
     )
