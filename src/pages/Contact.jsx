@@ -34,10 +34,10 @@ const Contact = () => {
     setStatus({ submitting: true, success: false, error: null });
 
     emailjs.send(
-      'service_h8lbgu3',      // Your Service ID
-      'template_y5537t8',     // Your Template ID
+      'service_oiajj6l',      // Your Service ID
+      'service_oiajj6l',     // Your Template ID
       formData,               // Data object matching your template variables
-      'qTTsda15feaglZYr-'    // Your Public Key (User ID)
+      '0IEdHQs1NcrJgl-Cy'    // Your Public Key (User ID)
     )
     .then(() => {
       setStatus({ submitting: false, success: true, error: null });

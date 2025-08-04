@@ -803,7 +803,7 @@ const servicesArr = [
                     ))}
                   </div>
                   <div className="text-sm font-semibold text-gray-700 mb-1">100% Customer Satisfaction</div>
-                  <div className="text-xs text-gray-500">Click to view all reviews</div>
+                  <div className="text-sm text-black font-bold">Click to view all reviews</div>
                 </a>
               </div>
             </div>
