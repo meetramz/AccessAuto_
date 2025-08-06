@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import emailjs from '@emailjs/browser';
 import { MapPin, Phone, Mail, Send, CheckCircle, ExternalLink, Clock } from 'lucide-react';
 import CartDropdown from '../components/CartDropdown';
 
@@ -29,23 +28,28 @@ const Contact = () => {
     }
   }, []);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setStatus({ submitting: true, success: false, error: null });
 
-    emailjs.send(
-      'service_oiajj6l',      // Your Service ID
-      'template_uqlk0o9',     // Your Template ID
-      formData,               // Data object matching your template variables
-      '0IEdHQs1NcrJgl-Cy'    // Your Public Key (User ID)
-    )
-    .then(() => {
-      setStatus({ submitting: false, success: true, error: null });
-      setFormData({ name: '', email: '', subject: '', message: '' });
-    })
-    .catch(() => {
+    try {
+      const response = await fetch('https://ltd-bbb.vercel.app/api/contact', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
+
+      if (response.ok) {
+        setStatus({ submitting: false, success: true, error: null });
+        setFormData({ name: '', email: '', subject: '', message: '' });
+      } else {
+        throw new Error('Failed to send message');
+      }
+    } catch (error) {
       setStatus({ submitting: false, success: false, error: 'Failed to send message. Please try again.' });
-    });
+    }
   };
 
   const contactInfo = [
@@ -85,8 +89,8 @@ const Contact = () => {
       content: (
         <div>
           <p>
-            <a href="mailto:info@accessautoservices.co.uk" className="hover:text-indigo-800 transition-colors duration-300">
-              info@accessautoservices.co.uk
+            <a href="mailto:info@access-auto-services.co.uk" className="hover:text-indigo-800 transition-colors duration-300">
+              info@access-auto-services.co.uk
             </a>
           </p>
           <p className="text-sm text-gray-600">We'll respond within 24 hours</p>
