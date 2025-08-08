@@ -52,9 +52,9 @@ const CartDropdown = memo(function CartDropdown(props) {
   }
 
   function handleProceedBooking() {
-    sendCartToBackend().then(() => {
-      navigate("/");
-    });
+    // Navigate to booking page with cart state
+    navigate("/booking", { state: { fromCart: true } });
+    setCartOpen(false);
   }
 
   const subtotal = cart.reduce((sum, item) => sum + (item.price || 0) * item.qty, 0);

@@ -279,28 +279,7 @@ const MOT = () => {
     localStorage.setItem('cart', JSON.stringify(cart));
   }, [cart]);
 
-  // Prevent scroll reset when cart or other states change
-  useEffect(() => {
-    if (servicesScrollRef.current) {
-      const currentScrollTop = servicesScrollRef.current.scrollTop;
-      // Preserve scroll position after state updates
-      setTimeout(() => {
-        if (servicesScrollRef.current && servicesScrollRef.current.scrollTop !== currentScrollTop) {
-          servicesScrollRef.current.scrollTop = currentScrollTop;
-        }
-      }, 0);
-    }
-    
-    // Also preserve sidebar scroll position
-    if (sidebarScrollRef.current) {
-      const currentSidebarScrollTop = sidebarScrollRef.current.scrollTop;
-      setTimeout(() => {
-        if (sidebarScrollRef.current && sidebarScrollRef.current.scrollTop !== currentSidebarScrollTop) {
-          sidebarScrollRef.current.scrollTop = currentSidebarScrollTop;
-        }
-      }, 0);
-    }
-  }, [cart, vehicleInfo, loadingVehicle]);
+  // Removed problematic scroll preservation useEffect that was causing automatic scrolling
 
   async function fetchVehicleInfo(regNumber) {
     setLoadingVehicle(true);
@@ -373,31 +352,14 @@ const MOT = () => {
     if (servicesScrollRef.current) {
       scrollPositions.current[selectedCategory] = servicesScrollRef.current.scrollTop;
     }
-    // Save sidebar scroll position
-    if (sidebarScrollRef.current) {
-      sidebarScrollPosition.current = sidebarScrollRef.current.scrollTop;
-    }
     setSelectedCategory(categoryId);
   }
 
-  // Restore scroll position when category changes
+  // Restore scroll position when category changes (simplified)
   useEffect(() => {
+    // Only restore scroll position if we have a saved position for this category
     if (servicesScrollRef.current && scrollPositions.current[selectedCategory] !== undefined) {
-      // Use setTimeout to ensure DOM is updated
-      setTimeout(() => {
-        if (servicesScrollRef.current) {
-          servicesScrollRef.current.scrollTop = scrollPositions.current[selectedCategory];
-        }
-      }, 0);
-    }
-    
-    // Restore sidebar scroll position
-    if (sidebarScrollRef.current && sidebarScrollPosition.current !== undefined) {
-      setTimeout(() => {
-        if (sidebarScrollRef.current) {
-          sidebarScrollRef.current.scrollTop = sidebarScrollPosition.current;
-        }
-      }, 0);
+      servicesScrollRef.current.scrollTop = scrollPositions.current[selectedCategory];
     }
   }, [selectedCategory]);
 
@@ -412,7 +374,6 @@ const MOT = () => {
     setSelectedCategory(allCategories[0].id);
     // Reset scroll positions when opening popup
     scrollPositions.current = {};
-    sidebarScrollPosition.current = 0;
   }
 
   // --- CartDropdown and ServicePopup components unchanged ---

@@ -100,27 +100,27 @@ function Booking() {
   const [bookingSuccess, setBookingSuccess] = useState(false);
   const [paymentProcessing, setPaymentProcessing] = useState(false);
 
-  // Get JWT token from localStorage (or context, or cookies)
+  // Get JWT token from localStorage (optional - for authenticated users)
   const token = localStorage.getItem("access_token");
 
-  // Utility for authenticated POST requests
+  // Utility for POST requests (with optional authentication)
   async function postWithAuth(url, data) {
     return fetch(url, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": token ? `Bearer ${token}` : undefined
+        ...(token && { "Authorization": `Bearer ${token}` })
       },
       body: JSON.stringify(data)
     });
   }
 
-  // Utility for authenticated GET requests
+  // Utility for GET requests (with optional authentication)
   async function getWithAuth(url) {
     return fetch(url, {
       method: "GET",
       headers: {
-        "Authorization": token ? `Bearer ${token}` : undefined
+        ...(token && { "Authorization": `Bearer ${token}` })
       }
     });
   }
@@ -265,12 +265,6 @@ function Booking() {
     e.preventDefault();
     setBookingLoading(true);
     setBookingError('');
-
-    if (!token) {
-      setBookingError("You must be logged in to book.");
-      setBookingLoading(false);
-      return;
-    }
 
     try {
       let bookingDetails = [];

@@ -253,28 +253,7 @@ const MOT = () => {
     localStorage.setItem('cart', JSON.stringify(cart));
   }, [cart]);
 
-  // Prevent scroll reset when cart or other states change
-  useEffect(() => {
-    if (servicesScrollRef.current) {
-      const currentScrollTop = servicesScrollRef.current.scrollTop;
-      // Preserve scroll position after state updates
-      setTimeout(() => {
-        if (servicesScrollRef.current && servicesScrollRef.current.scrollTop !== currentScrollTop) {
-          servicesScrollRef.current.scrollTop = currentScrollTop;
-        }
-      }, 0);
-    }
-    
-    // Also preserve sidebar scroll position
-    if (sidebarScrollRef.current) {
-      const currentSidebarScrollTop = sidebarScrollRef.current.scrollTop;
-      setTimeout(() => {
-        if (sidebarScrollRef.current && sidebarScrollRef.current.scrollTop !== currentSidebarScrollTop) {
-          sidebarScrollRef.current.scrollTop = currentSidebarScrollTop;
-        }
-      }, 0);
-    }
-  }, [cart, vehicleInfo, loadingVehicle]);
+  // Removed problematic scroll preservation useEffect that was causing automatic scrolling
 
   async function fetchVehicleInfo(regNumber) {
     setLoadingVehicle(true);
