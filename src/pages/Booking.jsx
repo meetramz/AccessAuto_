@@ -8,9 +8,10 @@ const API_CREATE_ORDER = "https://backend-kzpz.onrender.com/api/paypal/create-or
 const API_CAPTURE_PAYMENT = "https://backend-kzpz.onrender.com/api/paypal/capture-payment/";
 const API_EMAIL_VERIFICATION = "https://backend-kzpz.onrender.com/api/email/verification/";
 const API_BOOKING_REMINDER = "https://backend-kzpz.onrender.com/api/email/reminder/";
+const API_SERVICES = "https://backend-kzpz.onrender.com/api/services/";
 
 // Static list of services (frontend only, PKs must match your backend!)
-const services = [
+const DEFAULT_SERVICES = [
   { id: 1, code: 'mot', name: 'MOT Test', price: 54.85, description: 'Official MOT testing for Class 4, 5 & 7 vehicles' },
   { id: 2, code: 'service', name: 'Full Service', price: 89.00, description: 'Complete vehicle health check and maintenance' },
   { id: 3, code: 'repair', name: 'Vehicle Repair', price: 0, description: 'Custom repair based on your vehicle needs' },
@@ -67,6 +68,42 @@ function Booking() {
     }
   });
 
+  // Services state: start with defaults, then replace with backend data
+  const [services, setServices] = useState(DEFAULT_SERVICES);
+  const [servicesLoading, setServicesLoading] = useState(false);
+  const [servicesError, setServicesError] = useState('');
+
+  useEffect(() => {
+    let isMounted = true;
+    async function fetchServices() {
+      try {
+        setServicesLoading(true);
+        setServicesError('');
+        const res = await fetch(API_SERVICES);
+        if (!res.ok) {
+          throw new Error(`Failed to load services (${res.status})`);
+        }
+        const data = await res.json();
+        const incoming = Array.isArray(data?.results) ? data.results : [];
+        // Only update if we have something and the component is still mounted
+        if (isMounted && incoming.length > 0) {
+          setServices(incoming);
+        }
+      } catch (err) {
+        if (isMounted) {
+          setServicesError(err.message || 'Failed to load services');
+          // Keep DEFAULT_SERVICES as fallback
+        }
+      } finally {
+        if (isMounted) setServicesLoading(false);
+      }
+    }
+    fetchServices();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+  
   const [bookingData, setBookingData] = useState({
     service: '',
     motClass: '',
@@ -99,9 +136,17 @@ function Booking() {
   const [bookingError, setBookingError] = useState('');
   const [bookingSuccess, setBookingSuccess] = useState(false);
   const [paymentProcessing, setPaymentProcessing] = useState(false);
+  const [paypalEmail, setPaypalEmail] = useState('');
 
   // Get JWT token from localStorage (optional - for authenticated users)
   const token = localStorage.getItem("access_token");
+
+  // Auto-populate PayPal email with customer email when available
+  useEffect(() => {
+    if (bookingData.customer.email && !paypalEmail) {
+      setPaypalEmail(bookingData.customer.email);
+    }
+  }, [bookingData.customer.email, paypalEmail]);
 
   // Utility for POST requests (with optional authentication)
   async function postWithAuth(url, data) {
@@ -224,15 +269,19 @@ function Booking() {
     }
   };
 
-  // Create PayPal order
-  const createPayPalOrder = async (bookingId) => {
+  // Create PayPal order with booking_id and customer_email
+  const createPayPalOrder = async (booking_id, customer_email) => {
     try {
-      const response = await postWithAuth(API_CREATE_ORDER, { booking_id: bookingId });
+      const response = await postWithAuth(API_CREATE_ORDER, { 
+        booking_id: booking_id,
+        customer_email: customer_email
+      });
       if (response.ok) {
         const data = await response.json();
-        return data.order_id;
+        return data;
       } else {
-        throw new Error('Failed to create PayPal order');
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to create PayPal order');
       }
     } catch (error) {
       console.error('PayPal order creation failed:', error);
@@ -258,6 +307,106 @@ function Booking() {
     } catch (error) {
       console.error('PayPal payment capture failed:', error);
       throw error;
+    }
+  };
+
+  // Handle PayPal payment separately
+  const handlePayPalPayment = async () => {
+    if (!paypalEmail) {
+      setBookingError('Please enter your email for PayPal payment');
+      return;
+    }
+
+    setBookingLoading(true);
+    setBookingError('');
+
+    try {
+      let bookingDetails = [];
+      let createdBookingIds = [];
+      
+      // First, create the booking(s)
+      if (fromCart && cart.length > 0) {
+        // Submit each cart item as a separate booking
+        for (let item of cart) {
+          const matchedService = services.find(s => s.code === item.service_id || s.id === item.service_id);
+          const pk = matchedService ? matchedService.id : null;
+          const payload = {
+            ...bookingData,
+            service_id: pk,
+            quantity: item.qty,
+            price: item.price,
+          };
+          const bookingRes = await postWithAuth(API_BOOKINGS, payload);
+          if (!bookingRes.ok) {
+            throw new Error(await bookingRes.text());
+          }
+          
+          const bookingData_response = await bookingRes.json();
+          createdBookingIds.push(bookingData_response.id);
+          
+          // Add to booking details for email
+          bookingDetails.push({
+            service_name: item.name,
+            price: item.price,
+            quantity: item.qty,
+            date: bookingData.date,
+            time: bookingData.time,
+            vehicle_registration: bookingData.vehicle.registration
+          });
+        }
+      } else {
+        // Single service flow
+        const payload = {
+          ...bookingData,
+          service_id: bookingData.service,
+          quantity: 1,
+          price: selectedService?.code === 'mot' && bookingData.motClass ? motPrice : selectedService?.price,
+        };
+        const bookingRes = await postWithAuth(API_BOOKINGS, payload);
+        if (!bookingRes.ok) {
+          throw new Error(await bookingRes.text());
+        }
+        
+        const bookingData_response = await bookingRes.json();
+        createdBookingIds.push(bookingData_response.id);
+        
+        // Add to booking details for email
+        bookingDetails.push({
+          service_name: selectedService?.name,
+          mot_class: selectedService?.code === 'mot' ? bookingData.motClass : null,
+          price: selectedService?.code === 'mot' && bookingData.motClass ? motPrice : selectedService?.price,
+          quantity: 1,
+          date: bookingData.date,
+          time: bookingData.time,
+          vehicle_registration: bookingData.vehicle.registration
+        });
+      }
+
+      // Store booking IDs for future use
+      setBookingIds(createdBookingIds);
+
+      // Send email verification
+      await sendEmailVerification(bookingData.customer.email, bookingDetails);
+
+      // Schedule 24-hour reminder
+      const appointmentDateTime = `${bookingData.date}T${bookingData.time}:00`;
+      await scheduleBookingReminder(bookingData.customer.email, bookingDetails, appointmentDateTime);
+
+      // Now create PayPal order with booking_id and customer_email
+      const orderData = await createPayPalOrder(createdBookingIds[0], paypalEmail);
+      
+      if (orderData && orderData.approval_url) {
+        // Store PayPal order ID for later use
+        setPaypalOrderId(orderData.order_id || orderData.id);
+        
+        // Redirect to PayPal for payment approval
+        window.location.href = orderData.approval_url;
+      } else {
+        throw new Error('No approval URL received from PayPal');
+      }
+    } catch (error) {
+      setBookingError('PayPal payment initiation failed: ' + error.message);
+      setBookingLoading(false);
     }
   };
 
@@ -340,10 +489,10 @@ function Booking() {
       // For PayPal payment, create PayPal order for the first booking
       if (bookingData.payment.method === 'paypal' && createdBookingIds.length > 0) {
         try {
-          const orderId = await createPayPalOrder(createdBookingIds[0]);
+          const orderId = await createPayPalOrder(createdBookingIds[0], bookingData.customer.email);
           setPaypalOrderId(orderId);
           
-          // Here you would typically redirect to PayPal or show PayPal buttons
+          // Here you would typically redirect to PayPal or show  buttons
           // For now, we'll simulate successful payment
           console.log('PayPal Order Created:', orderId);
           
@@ -401,9 +550,10 @@ function Booking() {
       (step === 3 && !!bookingData.vehicle.make && !!bookingData.vehicle.model &&
         !!bookingData.vehicle.registration && !!bookingData.customer.firstName &&
         !!bookingData.customer.email && !!bookingData.customer.phone) ||
-      (step === 4 && (bookingData.payment.method === 'cash' || bookingData.payment.method === 'paypal' ||
-        (!!bookingData.payment.cardNumber && !!bookingData.payment.expiryDate &&
-          !!bookingData.payment.cvv && !!bookingData.payment.nameOnCard)))
+      (step === 4 && (bookingData.payment.method === 'cash' || 
+        (bookingData.payment.method === 'paypal' && !!paypalEmail) ||
+        (bookingData.payment.method === 'card' && !!bookingData.payment.cardNumber && 
+          !!bookingData.payment.expiryDate && !!bookingData.payment.cvv && !!bookingData.payment.nameOnCard)))
     );
   };
 
@@ -507,6 +657,16 @@ function Booking() {
                 <h2 className="text-3xl font-bold text-gray-800 mb-8 flex items-center">
                   Select Your Service
                 </h2>
+                {servicesLoading && (
+                  <div className="mb-4 bg-blue-50 text-blue-700 rounded-lg px-4 py-3 font-semibold">
+                    Loading services...
+                  </div>
+                )}
+                {servicesError && (
+                  <div className="mb-4 bg-yellow-50 text-yellow-700 rounded-lg px-4 py-3">
+                    Unable to load latest services. Showing defaults.
+                  </div>
+                )}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {services.map(service => (
                     <div
@@ -809,10 +969,37 @@ function Booking() {
 
                   {bookingData.payment.method === 'paypal' && (
                     <div className="bg-blue-50 p-6 rounded-lg">
-                      <h3 className="text-lg font-semibold text-blue-800 mb-2">PayPal Payment</h3>
-                      <p className="text-blue-700">
-                        You will be redirected to PayPal to complete your payment securely after confirming your booking.
+                      <h3 className="text-lg font-semibold text-blue-800 mb-4">PayPal Payment</h3>
+                      <div className="mb-4">
+                        <label className="block text-sm font-medium text-blue-700 mb-2">
+                          Email for PayPal Payment
+                          {bookingData.customer.email && (
+                            <span className="text-xs text-blue-600 font-normal ml-2">(auto-filled from contact details)</span>
+                          )}
+                        </label>
+                        <input
+                          type="email"
+                          value={paypalEmail}
+                          onChange={e => setPaypalEmail(e.target.value)}
+                          className="w-full p-3 border border-blue-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                          placeholder="Enter your email address"
+                          required
+                        />
+                      </div>
+                      <p className="text-blue-700 mb-4">
+                        You will be redirected to PayPal to complete your payment securely.
                       </p>
+                      <button
+                        onClick={handlePayPalPayment}
+                        disabled={!paypalEmail || bookingLoading || paymentProcessing}
+                        className={`w-full px-6 py-3 rounded-lg font-semibold transition-colors duration-300 ${
+                          paypalEmail && !bookingLoading && !paymentProcessing
+                            ? 'bg-blue-600 text-white hover:bg-blue-700'
+                            : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                        }`}
+                      >
+                        {bookingLoading || paymentProcessing ? 'Processing...' : 'Confirm and Pay with PayPal'}
+                      </button>
                     </div>
                   )}
 
@@ -991,17 +1178,20 @@ function Booking() {
                     Next
                   </button>
                 ) : (
-                  <button
-                    onClick={handleSubmit}
-                    disabled={!isStepValid() || bookingLoading || paymentProcessing}
-                    className={`px-8 py-3 rounded-lg font-semibold transition-colors duration-300 ${
-                      isStepValid() && !bookingLoading && !paymentProcessing
-                        ? 'bg-green-600 text-white hover:bg-green-700'
-                        : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                    }`}
-                  >
-                    {bookingLoading || paymentProcessing ? 'Processing...' : 'Confirm Booking'}
-                  </button>
+                  // Only show Confirm Booking button for non-PayPal payments
+                  bookingData.payment.method !== 'paypal' && (
+                    <button
+                      onClick={handleSubmit}
+                      disabled={!isStepValid() || bookingLoading || paymentProcessing}
+                      className={`px-8 py-3 rounded-lg font-semibold transition-colors duration-300 ${
+                        isStepValid() && !bookingLoading && !paymentProcessing
+                          ? 'bg-green-600 text-white hover:bg-green-700'
+                          : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                      }`}
+                    >
+                      {bookingLoading || paymentProcessing ? 'Processing...' : 'Confirm Booking'}
+                    </button>
+                  )
                 )}
               </div>
             )}

@@ -179,26 +179,20 @@ const BookingSystem = memo(function BookingSystem({
       <div className="space-y-4">
         <div>
           <label className="block text-white font-medium mb-2 text-sm">
-            Enter your Reg. No. (After select service)
+            Vehicle Registration & Search
           </label>
-          <div className="flex">
-            <div className="flex items-center px-2 bg-[var(--primary-blue)] rounded-l-lg">
-              <div className="w-6 h-4 bg-[var(--primary-blue-dark)] rounded-sm flex items-center justify-center">
-                <span className="text-white text-xs font-bold">GB</span>
-              </div>
-            </div>
-            <input
-              ref={regInputRef}
-              type="text"
-              value={regNo}
-              onChange={e => setRegNo(e.target.value.replace(/[^A-Za-z0-9]/g, '').toUpperCase())}
-              placeholder="ENTER REG NO."
-              className="flex-1 px-3 py-3 bg-[var(--primary-blue-lighter)] text-black font-bold placeholder-gray-700 rounded-r-lg focus:outline-none text-sm"
-              maxLength={10}
-              spellCheck={false}
-              autoComplete="off"
-            />
-          </div>
+          <iframe 
+            src="https://bookmygarage.com/widget/f336c8b760b04fb48ee3bc951010ed15/?a=transparent&b=%236a5acd&c=%23ffffff&f=%236a5acd&d=%236a5acd&e=%236a5acd" 
+            style={{
+              overflow: "hidden",
+              border: "none",
+              margin: "0",
+              minHeight: "214px",
+              width: "100%",
+              borderRadius: "8px"
+            }}
+            title="BookMyGarage Widget"
+          />
         </div>
         <button
           type="button"

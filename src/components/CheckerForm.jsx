@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, memo } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Shield, ShoppingCart, X as XIcon, ChevronRight } from 'lucide-react';
+import { Shield, ShoppingCart, X as XIcon, ChevronRight, Search } from 'lucide-react';
 
 // DVLA API endpoints
 const API_VEHICLE_INFO = "https://backend-kzpz.onrender.com/api/dvla/vehicle-info/";
@@ -179,6 +179,7 @@ const BookingSystem = memo(function BookingSystem({
   regInputRef,
   handleOpenServicePopup
 }) {
+  const [activeTab, setActiveTab] = useState('services');
   return (
     <div
       className="mt-8 p-4 rounded-xl w-full max-w-sm mx-auto"
@@ -189,10 +190,29 @@ const BookingSystem = memo(function BookingSystem({
       }}
     >
       <div className="space-y-2 mb-6">
+        <div className="flex gap-2">
+          <button
+            type="button"
+            onClick={() => setActiveTab('services')}
+            className={`flex-1 px-3 py-2 text-sm font-medium transition-all duration-300 ${
+              activeTab === 'services'
+                ? 'bg-white text-black'
+                : 'border border-white text-white hover:bg-white hover:text-black'
+            }`}
+            style={{ borderRadius: 'var(--radius-md)' }}
+          >
+            Services
+          </button>
+        </div>
         <div className="flex">
           <button
             type="button"
-            className="w-full bg-[var(--primary-blue)] text-white py-3 rounded-lg font-bold hover:bg-[var(--primary-blue-dark)] transition-colors flex items-center justify-center gap-2"
+            onClick={() => setActiveTab('book-mot')}
+            className={`w-full px-3 py-2 text-sm font-medium transition-all duration-300 flex items-center justify-center gap-2 ${
+              activeTab === 'book-mot'
+                ? 'bg-white text-black'
+                : 'border border-white text-white hover:bg-white hover:text-black'
+            }`}
             style={{ borderRadius: 'var(--radius-md)' }}
           >
             <Shield className="w-4 h-4" />
@@ -200,31 +220,24 @@ const BookingSystem = memo(function BookingSystem({
           </button>
         </div>
       </div>
-      <div className="space-y-4">
+      {activeTab === 'services' && (
+        <div className="space-y-4">
         <div>
           <label className="block text-white font-medium mb-2 text-sm">
-            Enter your Reg. No. (After select service)
+            Vehicle Registration & Search
           </label>
-          <div className="flex">
-            <div className="flex items-center px-2 bg-[var(--primary-blue)] rounded-l-lg">
-              <div className="w-6 h-4 bg-[var(--primary-blue-dark)] rounded-sm flex items-center justify-center">
-                <span className="text-white text-xs font-bold">GB</span>
-              </div>
-            </div>
-            <input
-              ref={regInputRef}
-              id="vehicle-reg-no"
-              name="vehicleRegNo"
-              type="text"
-              value={regNo}
-              onChange={e => setRegNo(e.target.value.replace(/[^A-Za-z0-9]/g, '').toUpperCase())}
-              placeholder="ENTER REG NO."
-              className="flex-1 px-3 py-3 bg-[var(--primary-blue-lighter)] text-black font-bold placeholder-gray-700 rounded-r-lg focus:outline-none text-sm"
-              maxLength={10}
-              spellCheck={false}
-              autoComplete="off"
-            />
-          </div>
+          <iframe 
+            src="https://bookmygarage.com/widget/f336c8b760b04fb48ee3bc951010ed15/?a=transparent&b=%236a5acd&c=%23ffffff&f=%236a5acd&d=%236a5acd&e=%236a5acd" 
+            style={{
+              overflow: "hidden",
+              border: "none",
+              margin: "0",
+              minHeight: "214px",
+              width: "100%",
+              borderRadius: "8px"
+            }}
+            title="BookMyGarage Widget"
+          />
         </div>
         <button
           type="button"
@@ -233,7 +246,36 @@ const BookingSystem = memo(function BookingSystem({
         >
           GO
         </button>
-      </div>
+        </div>
+      )}
+
+      {activeTab === 'book-mot' && (
+        <div className="space-y-4">
+          <div>
+            <iframe 
+              src="https://bookmygarage.com/widget/f336c8b760b04fb48ee3bc951010ed15/?a=transparent&b=%236a5acd&c=%23ffffff&f=%236a5acd&d=%236a5acd&e=%236a5acd" 
+              style={{
+                overflow: "hidden",
+                border: "none",
+                margin: "0",
+                minHeight: "214px",
+                width: "100%",
+                borderRadius: "8px"
+              }}
+              title="BookMyGarage Widget"
+            />
+          </div>
+          <p className="text-white text-center text-sm">Don't know your vehicle registration?</p>
+          <button
+            type="button"
+            onClick={handleOpenServicePopup}
+            className="w-full bg-[var(--primary-blue)] text-white py-3 rounded-lg font-bold hover:bg-[var(--primary-blue-dark)] transition-colors flex items-center justify-center gap-2"
+          >
+            <Search className="w-4 h-4" />
+            Search
+          </button>
+        </div>
+      )}
     </div>
   );
 });

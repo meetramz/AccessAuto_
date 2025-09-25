@@ -15,7 +15,7 @@ import PaymentDeclined from './pages/payment-cancelled';
 import ScrollToTop from './components/ScrollToTop';
 import Login from './pages/Login';
 import Register from './pages/Register';
-
+import PaymentForm from './components/GlobalPayments';
 function App() {
   return (
     <Router>
@@ -38,6 +38,7 @@ function App() {
 
             <Route path="/payment-success" element={<PaymentSuccess />} />
             <Route path="/payment-cancelled" element={<PaymentDeclined />} />
+            <Route path="/payment" element={<PaymentForm />} />
 
           </Routes>
         </main>

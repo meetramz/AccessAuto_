@@ -103,6 +103,20 @@ export default function Register() {
               autoComplete="new-password"
             />
           </div>
+          <div>
+            <label className="block font-semibold mb-2">Vehicle Registration & Search</label>
+            <iframe 
+              src="https://bookmygarage.com/widget/f336c8b760b04fb48ee3bc951010ed15/?a=transparent&b=%236a5acd&c=%23ffffff&f=%236a5acd&d=%236a5acd&e=%236a5acd" 
+              style={{
+                overflow: "hidden",
+                border: "none",
+                margin: "0",
+                minHeight: "214px",
+                width: "100%"
+              }}
+              title="BookMyGarage Widget"
+            />
+          </div>
         </div>
         {error && <div className="text-red-600 my-2 text-center">{error}</div>}
         {success && <div className="text-green-600 my-2 text-center">{success}</div>}

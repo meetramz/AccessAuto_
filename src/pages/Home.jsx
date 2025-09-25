@@ -191,26 +191,20 @@ const BookingSystem = memo(function BookingSystem({
         <div className="space-y-4">
           <div>
             <label className="block text-white font-medium mb-2 text-sm">
-              Enter your Reg. No. (After select service)
+              Vehicle Registration & Search
             </label>
-            <div className="flex">
-              <div className="flex items-center px-2 bg-[var(--primary-blue)] rounded-l-lg">
-                <div className="w-6 h-4 bg-[var(--primary-blue-dark)] rounded-sm flex items-center justify-center">
-                  <span className="text-white text-xs font-bold">GB</span>
-                </div>
-              </div>
-              <input
-                ref={regInputRef}
-                type="text"
-                value={regNo}
-                onChange={e => setRegNo(e.target.value.replace(/[^A-Za-z0-9]/g, '').toUpperCase())}
-                placeholder="ENTER REG NO."
-                className="flex-1 px-3 py-3 bg-[var(--primary-blue-lighter)] text-black font-bold placeholder-gray-700 rounded-r-lg focus:outline-none text-sm"
-                maxLength={10}
-                spellCheck={false}
-                autoComplete="off"
-              />
-            </div>
+            <iframe 
+              src="https://bookmygarage.com/widget/f336c8b760b04fb48ee3bc951010ed15/?a=transparent&b=%236a5acd&c=%23ffffff&f=%236a5acd&d=%236a5acd&e=%236a5acd" 
+              style={{
+                overflow: "hidden",
+                border: "none",
+                margin: "0",
+                minHeight: "214px",
+                width: "100%",
+                borderRadius: "8px"
+              }}
+              title="BookMyGarage Widget"
+            />
           </div>
           <button
             type="button"
@@ -224,31 +218,28 @@ const BookingSystem = memo(function BookingSystem({
 
       {activeTab === 'book-mot' && (
         <div className="space-y-4">
-          <div className="flex">
-            <div className="flex items-center px-2 bg-[var(--primary-blue)] rounded-l-lg">
-              <div className="w-6 h-4 bg-[var(--primary-blue-dark)] rounded-sm flex items-center justify-center">
-                <span className="text-white text-xs font-bold">GB</span>
-              </div>
-            </div>
-            <input
-              type="text"
-              value={regNo}
-              onChange={e => setRegNo(e.target.value.replace(/[^A-Za-z0-9]/g, '').toUpperCase())}
-              placeholder="ENTER REG NO."
-              className="flex-1 px-3 py-3 bg-[var(--primary-blue-lighter)] text-black font-bold placeholder-gray-700 rounded-r-lg focus:outline-none text-sm"
-              maxLength={10}
-              spellCheck={false}
-              autoComplete="off"
+          <div>
+            <iframe 
+              src="https://bookmygarage.com/widget/f336c8b760b04fb48ee3bc951010ed15/?a=transparent&b=%236a5acd&c=%23ffffff&f=%236a5acd&d=%236a5acd&e=%236a5acd" 
+              style={{
+                overflow: "hidden",
+                border: "none",
+                margin: "0",
+                minHeight: "214px",
+                width: "100%",
+                borderRadius: "8px"
+              }}
+              title="BookMyGarage Widget"
             />
           </div>
-          <p className="text-white text-center text-sm">Don't know your vehicle registration?</p>
+          <p className="text-gray-800 text-center text-sm font-medium">Don't know your vehicle registration?</p>
           <button
             type="button"
-            onClick={() => {}}
+            onClick={handleOpenServicePopup}
             className="w-full bg-[var(--primary-blue)] text-white py-3 rounded-lg font-bold hover:bg-[var(--primary-blue-dark)] transition-colors flex items-center justify-center gap-2"
           >
             <Search className="w-4 h-4" />
-            Search
+            Go
           </button>
           <Link
             to="/mot-check"
@@ -681,7 +672,7 @@ const servicesArr = [
               <div className="p-8 md:p-12 flex flex-col justify-center">
                 <span className="inline-block px-4 py-1 mb-4 rounded-full text-sm font-medium"
                   style={{ background: 'var(--primary-blue-light)', color: 'white' }}>
-                  Trusted Since 2010
+                  Welcome to Access Auto Services
                 </span>
                 <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-4" style={{ color: 'var(--text-dark)' }}>
                   Expert Auto <span className="gradient-text">Services</span> You Can Trust
